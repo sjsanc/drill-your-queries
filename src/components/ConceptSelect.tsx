@@ -7,18 +7,30 @@ interface ConceptSelectProps {
     onChange: (ids: ConceptId[]) => void;
 }
 
-export default function ConceptSelect({ selected, onChange }: ConceptSelectProps) {
+export default function ConceptSelect({
+    selected,
+    onChange,
+}: ConceptSelectProps) {
     const isFiltered = selected.length > 0;
 
     function toggle(id: ConceptId) {
-        onChange(selected.includes(id) ? selected.filter(s => s !== id) : [...selected, id]);
+        onChange(
+            selected.includes(id)
+                ? selected.filter((s) => s !== id)
+                : [...selected, id],
+        );
     }
 
     return (
         <Popover.Root>
             <Popover.Trigger asChild>
                 <button className="flex items-center gap-1.5 text-sm text-zinc-300 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 px-2.5 py-1.5 rounded outline-none cursor-pointer">
-                    <LightbulbIcon size={13} className={isFiltered ? "text-purple-400" : "text-zinc-400"} />
+                    <LightbulbIcon
+                        size={13}
+                        className={
+                            isFiltered ? "text-purple-400" : "text-zinc-400"
+                        }
+                    />
                     Focus
                     {isFiltered && (
                         <span className="bg-purple-600 text-white text-xs font-medium px-1.5 py-0.5 rounded-full leading-none">
@@ -37,7 +49,9 @@ export default function ConceptSelect({ selected, onChange }: ConceptSelectProps
                     className="z-50 w-72 bg-zinc-800 border border-zinc-700 rounded shadow-xl overflow-hidden flex flex-col"
                 >
                     <div className="flex items-center justify-between px-3 py-2 border-b border-zinc-700">
-                        <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">Focus concepts</span>
+                        <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">
+                            Focus concepts
+                        </span>
                         <button
                             onClick={() => onChange([])}
                             disabled={!isFiltered}
@@ -48,9 +62,13 @@ export default function ConceptSelect({ selected, onChange }: ConceptSelectProps
                     </div>
 
                     <div className="overflow-y-auto max-h-96">
-                        {CONCEPT_GROUPS.map(group => {
-                            const groupIds = group.concepts.map(c => c.id) as ConceptId[];
-                            const someGroupOn = groupIds.some(id => selected.includes(id));
+                        {CONCEPT_GROUPS.map((group) => {
+                            const groupIds = group.concepts.map(
+                                (c) => c.id,
+                            ) as ConceptId[];
+                            const someGroupOn = groupIds.some((id) =>
+                                selected.includes(id),
+                            );
 
                             return (
                                 <div key={group.category}>
@@ -59,10 +77,12 @@ export default function ConceptSelect({ selected, onChange }: ConceptSelectProps
                                             {group.category}
                                         </span>
                                         {someGroupOn && (
-                                            <span className="text-xs text-purple-400">some</span>
+                                            <span className="text-xs text-purple-400">
+                                                some
+                                            </span>
                                         )}
                                     </div>
-                                    {group.concepts.map(concept => {
+                                    {group.concepts.map((concept) => {
                                         const id = concept.id as ConceptId;
                                         return (
                                             <label
@@ -71,11 +91,15 @@ export default function ConceptSelect({ selected, onChange }: ConceptSelectProps
                                             >
                                                 <input
                                                     type="checkbox"
-                                                    checked={selected.includes(id)}
+                                                    checked={selected.includes(
+                                                        id,
+                                                    )}
                                                     onChange={() => toggle(id)}
                                                     className="accent-purple-500 cursor-pointer"
                                                 />
-                                                <span className="text-xs text-zinc-300">{concept.label}</span>
+                                                <span className="text-xs text-zinc-300">
+                                                    {concept.label}
+                                                </span>
                                             </label>
                                         );
                                     })}
@@ -83,7 +107,6 @@ export default function ConceptSelect({ selected, onChange }: ConceptSelectProps
                             );
                         })}
                     </div>
-
                 </Popover.Content>
             </Popover.Portal>
         </Popover.Root>

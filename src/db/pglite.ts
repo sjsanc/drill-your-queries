@@ -29,21 +29,27 @@ export class PgliteEngine implements IDbEngine {
         const tables = await this.db.query<{ table_name: string }>(
             `SELECT table_name FROM information_schema.tables
              WHERE table_schema = 'public' AND table_type = 'BASE TABLE'
-             ORDER BY table_name`
+             ORDER BY table_name`,
         );
         return Promise.all(
             tables.rows.map(async ({ table_name }) => {
-                const cols = await this.db!.query<{ column_name: string; data_type: string }>(
+                const cols = await this.db!.query<{
+                    column_name: string;
+                    data_type: string;
+                }>(
                     `SELECT column_name, data_type FROM information_schema.columns
                      WHERE table_schema = 'public' AND table_name = $1
                      ORDER BY ordinal_position`,
-                    [table_name]
+                    [table_name],
                 );
                 return {
                     name: table_name,
-                    columns: cols.rows.map((r) => ({ name: r.column_name, type: r.data_type.toUpperCase() })),
+                    columns: cols.rows.map((r) => ({
+                        name: r.column_name,
+                        type: r.data_type.toUpperCase(),
+                    })),
                 };
-            })
+            }),
         );
     }
 

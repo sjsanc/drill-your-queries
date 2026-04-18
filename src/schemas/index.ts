@@ -1,7 +1,7 @@
 import type { ISchemaDefinition } from "../types/schema-definition";
+import { ecommerceScenarios } from "./ecommerce.scenarios";
 import ecommerceSql from "./ecommerce.sql?raw";
 import hrSql from "./hr.sql?raw";
-import { ecommerceScenarios } from "./ecommerce.scenarios";
 
 export const ecommerceSchema: ISchemaDefinition = {
     id: "ecommerce",

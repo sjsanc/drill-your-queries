@@ -6,7 +6,7 @@
 	"scripts": {
 		"dev": "vite",
 		"build": "tsc -b && vite build",
-		"lint": "",
+		"lint": "biome check src",
 		"preview": "vite preview",
 		"deploy": "npm run build && wrangler pages deploy dist --project-name drill-your-queries"
 	},

@@ -1,5 +1,5 @@
-import initSqlJs from "sql.js";
 import type { Database } from "sql.js";
+import initSqlJs from "sql.js";
 import sqlWasm from "sql.js/dist/sql-wasm.wasm?url";
 import type { IDbEngine, QueryResult } from "../types/engine";
 import type { SchemaTable } from "../types/schema";
@@ -26,7 +26,7 @@ export class SqliteEngine implements IDbEngine {
         return {
             columns,
             rows: values.map((row) =>
-                Object.fromEntries(columns.map((col, i) => [col, row[i]]))
+                Object.fromEntries(columns.map((col, i) => [col, row[i]])),
             ),
         };
     }
@@ -34,7 +34,7 @@ export class SqliteEngine implements IDbEngine {
     async introspect(): Promise<SchemaTable[]> {
         if (!this.db) throw new Error("Engine not initialised");
         const tableRows = this.db.exec(
-            `SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name`
+            `SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' ORDER BY name`,
         );
         if (tableRows.length === 0) return [];
         const tableNames = tableRows[0].values.map((r) => r[0] as string);
@@ -42,7 +42,10 @@ export class SqliteEngine implements IDbEngine {
             const info = this.db!.exec(`PRAGMA table_info(${name})`);
             const columns =
                 info.length > 0
-                    ? info[0].values.map((r) => ({ name: r[1] as string, type: r[2] as string }))
+                    ? info[0].values.map((r) => ({
+                          name: r[1] as string,
+                          type: r[2] as string,
+                      }))
                     : [];
             return { name, columns };
         });

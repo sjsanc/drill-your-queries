@@ -1,13 +1,19 @@
-import { createContext, useContext, useEffect, useReducer, useRef } from "react";
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useReducer,
+    useRef,
+} from "react";
 import { DuckdbEngine } from "../db/duckdb";
 import { PgliteEngine } from "../db/pglite";
 import { SqliteEngine } from "../db/sqlite";
 import { useLocalStorage } from "../hooks/useLocalStorage";
-import { STORAGE_KEYS } from "../utils/storageKeys";
 import { schemas } from "../schemas";
 import type { EngineId, IDbEngine, QueryResult } from "../types/engine";
-import type { ISchemaDefinition } from "../types/schema-definition";
 import type { SchemaTable } from "../types/schema";
+import type { ISchemaDefinition } from "../types/schema-definition";
+import { STORAGE_KEYS } from "../utils/storageKeys";
 
 interface DbState {
     engineId: EngineId;
@@ -25,7 +31,14 @@ type DbAction =
 function reducer(state: DbState, action: DbAction): DbState {
     switch (action.type) {
         case "INIT_START":
-            return { ...state, engineId: action.engineId, schemaDef: action.schemaDef, schema: [], status: "initialising", error: null };
+            return {
+                ...state,
+                engineId: action.engineId,
+                schemaDef: action.schemaDef,
+                schema: [],
+                status: "initialising",
+                error: null,
+            };
         case "INIT_DONE":
             return { ...state, schema: action.schema, status: "ready" };
         case "INIT_ERROR":
@@ -34,7 +47,10 @@ function reducer(state: DbState, action: DbAction): DbState {
 }
 
 interface DbContextValue extends DbState {
-    switchEngine(engineId: EngineId, schemaDef: ISchemaDefinition): Promise<void>;
+    switchEngine(
+        engineId: EngineId,
+        schemaDef: ISchemaDefinition,
+    ): Promise<void>;
     loadSchema(schemaDef: ISchemaDefinition): Promise<void>;
     query(sql: string): Promise<QueryResult>;
 }
@@ -53,11 +69,22 @@ function makeEngine(id: EngineId): IDbEngine {
     return new DuckdbEngine();
 }
 
-export function DbProvider({ initialEngineId, initialSchema, children }: DbProviderProps) {
-    const [savedEngineId, setSavedEngineId] = useLocalStorage<EngineId>(STORAGE_KEYS.engineId, initialEngineId);
-    const [savedSchemaId, setSavedSchemaId] = useLocalStorage<string>(STORAGE_KEYS.schemaId, initialSchema.id);
+export function DbProvider({
+    initialEngineId,
+    initialSchema,
+    children,
+}: DbProviderProps) {
+    const [savedEngineId, setSavedEngineId] = useLocalStorage<EngineId>(
+        STORAGE_KEYS.engineId,
+        initialEngineId,
+    );
+    const [savedSchemaId, setSavedSchemaId] = useLocalStorage<string>(
+        STORAGE_KEYS.schemaId,
+        initialSchema.id,
+    );
 
-    const resolvedSchema = schemas.find((s) => s.id === savedSchemaId) ?? initialSchema;
+    const resolvedSchema =
+        schemas.find((s) => s.id === savedSchemaId) ?? initialSchema;
 
     const [state, dispatch] = useReducer(reducer, {
         engineId: savedEngineId,
@@ -69,7 +96,10 @@ export function DbProvider({ initialEngineId, initialSchema, children }: DbProvi
 
     const engineRef = useRef<IDbEngine | null>(null);
 
-    async function applySchema(engineId: EngineId, schemaDef: ISchemaDefinition) {
+    async function applySchema(
+        engineId: EngineId,
+        schemaDef: ISchemaDefinition,
+    ) {
         dispatch({ type: "INIT_START", engineId, schemaDef });
         try {
             await engineRef.current?.destroy();
@@ -84,7 +114,10 @@ export function DbProvider({ initialEngineId, initialSchema, children }: DbProvi
         }
     }
 
-    async function switchEngine(engineId: EngineId, schemaDef: ISchemaDefinition) {
+    async function switchEngine(
+        engineId: EngineId,
+        schemaDef: ISchemaDefinition,
+    ) {
         setSavedEngineId(engineId);
         setSavedSchemaId(schemaDef.id);
         return applySchema(engineId, schemaDef);
@@ -105,7 +138,9 @@ export function DbProvider({ initialEngineId, initialSchema, children }: DbProvi
     }, []);
 
     return (
-        <DbContext.Provider value={{ ...state, switchEngine, loadSchema, query }}>
+        <DbContext.Provider
+            value={{ ...state, switchEngine, loadSchema, query }}
+        >
             {children}
         </DbContext.Provider>
     );

@@ -1,8 +1,8 @@
 import * as Select from "@radix-ui/react-select";
-import { DatabaseIcon, ChevronDownIcon } from "lucide-react";
-import type { EngineId } from "../types/engine";
-import { ecommerceSchema } from "../schemas";
+import { ChevronDownIcon, DatabaseIcon } from "lucide-react";
 import { useDb } from "../context/DbContext";
+import { ecommerceSchema } from "../schemas";
+import type { EngineId } from "../types/engine";
 
 const engines: { id: EngineId; label: string }[] = [
     { id: "sqlite", label: "SQLite" },
@@ -19,7 +19,11 @@ export default function EngineSelect() {
     }
 
     return (
-        <Select.Root value={engineId} onValueChange={handleChange} disabled={status === "initialising"}>
+        <Select.Root
+            value={engineId}
+            onValueChange={handleChange}
+            disabled={status === "initialising"}
+        >
             <Select.Trigger className="flex items-center gap-1.5 text-sm text-zinc-300 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 px-2.5 py-1.5 rounded outline-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
                 <DatabaseIcon size={13} className="text-purple-400" />
                 <Select.Value />

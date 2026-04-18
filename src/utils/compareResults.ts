@@ -3,7 +3,10 @@ import type { QueryResult } from "../types/engine";
 const serialize = (row: Record<string, unknown>) =>
     JSON.stringify(Object.fromEntries([...Object.entries(row)].sort()));
 
-export function compareResults(expected: QueryResult, actual: QueryResult): boolean {
+export function compareResults(
+    expected: QueryResult,
+    actual: QueryResult,
+): boolean {
     if (expected.columns.length !== actual.columns.length) return false;
     const expectedCols = [...expected.columns].sort();
     const actualCols = [...actual.columns].sort();
@@ -19,7 +22,10 @@ export interface DetailedComparison {
     rowResults: boolean[];
 }
 
-export function detailedComparison(expected: QueryResult, actual: QueryResult): DetailedComparison {
+export function detailedComparison(
+    expected: QueryResult,
+    actual: QueryResult,
+): DetailedComparison {
     const expectedColSet = new Set(expected.columns);
     const columnMatch: Record<string, boolean> = {};
     for (const col of actual.columns) {

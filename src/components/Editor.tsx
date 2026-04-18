@@ -1,20 +1,25 @@
-import { sql, SQLite, PostgreSQL } from "@codemirror/lang-sql";
-import { defaultHighlightStyle, HighlightStyle, indentOnInput, syntaxHighlighting } from "@codemirror/language";
+import { autocompletion, closeBrackets } from "@codemirror/autocomplete";
+import { PostgreSQL, SQLite, sql } from "@codemirror/lang-sql";
+import {
+    defaultHighlightStyle,
+    HighlightStyle,
+    indentOnInput,
+    syntaxHighlighting,
+} from "@codemirror/language";
 import { Compartment, EditorState, Prec } from "@codemirror/state";
 import {
-    EditorView,
     drawSelection,
+    EditorView,
     highlightActiveLine,
     highlightActiveLineGutter,
     keymap,
     lineNumbers,
     placeholder,
 } from "@codemirror/view";
-import { autocompletion, closeBrackets } from "@codemirror/autocomplete";
 import { tags } from "@lezer/highlight";
 import { useEffect, useRef } from "react";
-import type { SchemaTable } from "../types/schema";
 import type { EngineId } from "../types/engine";
+import type { SchemaTable } from "../types/schema";
 import { formatQuery } from "../utils/formatQuery";
 
 interface EditorProps {
@@ -32,7 +37,11 @@ const sqlHighlight = HighlightStyle.define([
 
 const baseTheme = EditorView.theme({
     "&": { height: "100%" },
-    ".cm-scroller": { overflow: "auto", fontFamily: "monospace", fontSize: "15px" },
+    ".cm-scroller": {
+        overflow: "auto",
+        fontFamily: "monospace",
+        fontSize: "15px",
+    },
 });
 
 function getDialect(engineId: EngineId) {
@@ -41,10 +50,18 @@ function getDialect(engineId: EngineId) {
 }
 
 function buildSqlSchema(schema: SchemaTable[]): Record<string, string[]> {
-    return Object.fromEntries(schema.map((t) => [t.name, t.columns.map((c) => c.name)]));
+    return Object.fromEntries(
+        schema.map((t) => [t.name, t.columns.map((c) => c.name)]),
+    );
 }
 
-export default function Editor({ value, onChange, onRun, schema = [], engineId = "sqlite" }: EditorProps) {
+export default function Editor({
+    value,
+    onChange,
+    onRun,
+    schema = [],
+    engineId = "sqlite",
+}: EditorProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const viewRef = useRef<EditorView | null>(null);
     const onRunRef = useRef(onRun);
@@ -74,7 +91,7 @@ export default function Editor({ value, onChange, onRun, schema = [], engineId =
                             dialect: getDialect(engineId),
                             schema: buildSqlSchema(schema),
                             upperCaseKeywords: true,
-                        })
+                        }),
                     ),
                     autocompletion(),
                     placeholder("Write your query here..."),
@@ -82,25 +99,38 @@ export default function Editor({ value, onChange, onRun, schema = [], engineId =
                         keymap.of([
                             {
                                 key: "Ctrl-Enter",
-                                run: () => { onRunRef.current?.(); return true; },
+                                run: () => {
+                                    onRunRef.current?.();
+                                    return true;
+                                },
                             },
                             {
                                 key: "Ctrl-Shift-f",
                                 run: (v) => {
                                     try {
-                                        const formatted = formatQuery(v.state.doc.toString(), engineIdRef.current);
-                                        v.dispatch({ changes: { from: 0, to: v.state.doc.length, insert: formatted } });
+                                        const formatted = formatQuery(
+                                            v.state.doc.toString(),
+                                            engineIdRef.current,
+                                        );
+                                        v.dispatch({
+                                            changes: {
+                                                from: 0,
+                                                to: v.state.doc.length,
+                                                insert: formatted,
+                                            },
+                                        });
                                     } catch {
                                         // unparseable — leave as-is
                                     }
                                     return true;
                                 },
                             },
-                        ])
+                        ]),
                     ),
                     baseTheme,
                     EditorView.updateListener.of((update) => {
-                        if (update.docChanged) onChange(update.state.doc.toString());
+                        if (update.docChanged)
+                            onChange(update.state.doc.toString());
                     }),
                 ],
             }),
@@ -120,7 +150,7 @@ export default function Editor({ value, onChange, onRun, schema = [], engineId =
                     dialect: getDialect(engineId),
                     schema: buildSqlSchema(schema),
                     upperCaseKeywords: true,
-                })
+                }),
             ),
         });
     }, [engineId, schema]);
@@ -130,7 +160,9 @@ export default function Editor({ value, onChange, onRun, schema = [], engineId =
         if (!view) return;
         const current = view.state.doc.toString();
         if (current !== value) {
-            view.dispatch({ changes: { from: 0, to: current.length, insert: value } });
+            view.dispatch({
+                changes: { from: 0, to: current.length, insert: value },
+            });
         }
     }, [value]);
 

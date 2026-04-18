@@ -1,9 +1,9 @@
 import { ChevronDown, ChevronRight, ChevronsUpDown } from "lucide-react";
 import { useState } from "react";
 import { useDb } from "../context/DbContext";
-import { getTypeColor } from "../utils/typeColors";
-import type { SchemaTable } from "../types/schema";
 import type { EngineId } from "../types/engine";
+import type { SchemaTable } from "../types/schema";
+import { getTypeColor } from "../utils/typeColors";
 
 interface SchemaSidebarProps {
     engine: EngineId;
@@ -28,7 +28,11 @@ function TableEntry({
                 className="w-full px-2 py-1 text-sm flex items-center justify-between hover:bg-zinc-100 cursor-pointer"
             >
                 {table.name}
-                {expanded ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
+                {expanded ? (
+                    <ChevronDown size={15} />
+                ) : (
+                    <ChevronRight size={15} />
+                )}
             </button>
             {expanded && (
                 <div className="pb-2">
@@ -38,7 +42,9 @@ function TableEntry({
                             className="pl-6 pr-2 py-0.5 font-mono text-xs flex items-center justify-between"
                         >
                             <span className="text-zinc-700">{col.name}</span>
-                            <span className={getTypeColor(engine, col.type)}>{col.type}</span>
+                            <span className={getTypeColor(engine, col.type)}>
+                                {col.type}
+                            </span>
                         </div>
                     ))}
                 </div>
@@ -50,13 +56,15 @@ function TableEntry({
 export default function SchemaSidebar({ engine, schema }: SchemaSidebarProps) {
     const { schemaDef } = useDb();
     const [expandedTables, setExpandedTables] = useState<Set<string>>(
-        () => new Set(schema.map((t) => t.name))
+        () => new Set(schema.map((t) => t.name)),
     );
 
     const allExpanded = expandedTables.size === schema.length;
 
     function toggleAll() {
-        setExpandedTables(allExpanded ? new Set() : new Set(schema.map((t) => t.name)));
+        setExpandedTables(
+            allExpanded ? new Set() : new Set(schema.map((t) => t.name)),
+        );
     }
 
     function toggleTable(name: string) {
@@ -71,7 +79,10 @@ export default function SchemaSidebar({ engine, schema }: SchemaSidebarProps) {
         <div className="h-full overflow-y-auto dot-grid">
             <div className="border-b border-zinc-300 px-2 py-2 text-xs font-semibold uppercase tracking-wide text-zinc-500 flex items-center justify-between bg-white">
                 <span>{schemaDef?.name ?? "Schema"}</span>
-                <button onClick={toggleAll} className="text-zinc-400 hover:text-zinc-600 cursor-pointer">
+                <button
+                    onClick={toggleAll}
+                    className="text-zinc-400 hover:text-zinc-600 cursor-pointer"
+                >
                     <ChevronsUpDown size={13} />
                 </button>
             </div>
