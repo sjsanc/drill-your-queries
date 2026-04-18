@@ -20,9 +20,9 @@ CREATE TABLE IF NOT EXISTS employees (
   manager_id INTEGER REFERENCES employees(id),
   job_grade_id INTEGER REFERENCES job_grades(id),
   salary REAL NOT NULL,
-  hired_at TEXT NOT NULL,
+  hired_at DATE NOT NULL,
   status TEXT NOT NULL DEFAULT 'active',
-  skills TEXT NOT NULL DEFAULT '[]'
+  skills JSONB NOT NULL DEFAULT '[]'
 );
 
 CREATE TABLE IF NOT EXISTS performance_reviews (
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS performance_reviews (
   reviewer_id INTEGER REFERENCES employees(id),
   period TEXT NOT NULL,
   score INTEGER NOT NULL,
-  reviewed_at TEXT NOT NULL
+  reviewed_at DATE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS projects (
@@ -39,8 +39,8 @@ CREATE TABLE IF NOT EXISTS projects (
   name TEXT NOT NULL,
   department_id INTEGER REFERENCES departments(id),
   status TEXT NOT NULL DEFAULT 'planning',
-  start_date TEXT NOT NULL,
-  end_date TEXT
+  start_date DATE NOT NULL,
+  end_date DATE
 );
 
 CREATE TABLE IF NOT EXISTS project_assignments (
@@ -55,12 +55,11 @@ CREATE TABLE IF NOT EXISTS leave_requests (
   id INTEGER PRIMARY KEY,
   employee_id INTEGER REFERENCES employees(id),
   type TEXT NOT NULL,
-  start_date TEXT NOT NULL,
-  end_date TEXT NOT NULL,
+  start_date DATE NOT NULL,
+  end_date DATE NOT NULL,
   status TEXT NOT NULL DEFAULT 'pending'
 );
 
--- Departments: dept 5 (Legal) has no employees — for RIGHT JOIN / FULL OUTER JOIN demos
 INSERT INTO departments VALUES
   (1, 'Engineering', 'New York'),
   (2, 'Product',     'San Francisco'),
@@ -75,9 +74,6 @@ INSERT INTO job_grades VALUES
   (4, 'L4', 100000, 135000),
   (5, 'L5', 125000, 165000);
 
--- Employees: 20 across depts 1-4; employee 5 is terminated
--- employees 1-3 have no project assignments (dept heads) — for LEFT JOIN / EXCEPT demos
--- manager hierarchy is 4 levels deep — for recursive CTE demos
 INSERT INTO employees VALUES
   (1,  'Sarah',  'Connor',   'sarah@corp.com',  1, NULL, 5, 155000, '2018-03-01', 'active',     '["Python","Go","Kubernetes","SQL"]'),
   (2,  'James',  'Wright',   'james@corp.com',  2, NULL, 5, 148000, '2017-09-15', 'active',     '["Product Strategy","SQL","Roadmapping"]'),
@@ -100,7 +96,6 @@ INSERT INTO employees VALUES
   (19, 'Mia',    'Foster',   'mia@corp.com',    4, 4,    2,  65000, '2023-07-01', 'active',     '["HR","Recruitment"]'),
   (20, 'Leo',    'Barnes',   'leo@corp.com',    1, 7,    1,  52000, '2024-01-15', 'active',     '["Python","React"]');
 
--- Reviews: employees 10-18, 20 are reviewed; 1-9 and 19 are not
 INSERT INTO performance_reviews VALUES
   (1,  10, 6,  '2023-H1', 4, '2023-07-10'),
   (2,  11, 6,  '2023-H1', 5, '2023-07-10'),
@@ -118,7 +113,6 @@ INSERT INTO performance_reviews VALUES
   (14, 20, 7,  '2024-H1', 3, '2024-07-05'),
   (15, 18, 9,  '2024-H1', 4, '2024-07-08');
 
--- Projects: project 7 has no assignments — for EXCEPT / NOT EXISTS demos
 INSERT INTO projects VALUES
   (1, 'API Redesign',       1, 'active',    '2024-01-01', NULL),
   (2, 'Mobile App',         1, 'completed', '2023-06-01', '2024-02-28'),
@@ -128,7 +122,6 @@ INSERT INTO projects VALUES
   (6, 'Recruitment Drive',  4, 'active',    '2024-03-01', NULL),
   (7, 'Onboarding Refresh', 4, 'planning',  '2024-06-01', NULL);
 
--- Assignments: employees 1-3 have none
 INSERT INTO project_assignments VALUES
   (6,  1, 'Tech Lead',    40),
   (7,  1, 'Tech Lead',    32),

@@ -330,6 +330,12 @@ export const CONCEPTS = [
         engine: "sqlite",
         category: "SQLite",
     },
+    {
+        id: "sqlite-json-col",
+        label: "json_each(), querying JSON columns",
+        engine: "sqlite",
+        category: "SQLite",
+    },
 
     {
         id: "pg-date",
@@ -340,6 +346,12 @@ export const CONCEPTS = [
     {
         id: "pg-json",
         label: "json_build_object(), json_agg(), ->> operator",
+        engine: "pg",
+        category: "PostgreSQL",
+    },
+    {
+        id: "pg-jsonb",
+        label: "JSONB @>, ?, jsonb_array_elements_text()",
         engine: "pg",
         category: "PostgreSQL",
     },
