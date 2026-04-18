@@ -1,4 +1,4 @@
-export type EngineTag = "generic" | "sqlite" | "pg" | "duckdb";
+export type EngineTag = "generic" | "sqlite" | "pg";
 
 export const CATEGORY_ORDER = [
     "Filtering & Selection",

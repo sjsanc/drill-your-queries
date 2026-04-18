@@ -170,7 +170,7 @@ function Shell() {
         setRevealed(false);
         setSelectedConcepts([]);
         setScenario((current) => {
-            if (current?.engines && !current.engines.includes(engineId as EngineId)) {
+            if (current?.engines && !(current.engines as string[]).includes(engineId)) {
                 return pickRandom(allScenarios, null, passedIds);
             }
             return current;

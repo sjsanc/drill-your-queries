@@ -6,6 +6,6 @@ export function filterScenariosForEngine(
     engineId: EngineId,
 ): Scenario[] {
     return scenarios.filter(
-        (s) => !s.engines || s.engines.includes(engineId),
+        (s) => !s.engines || (s.engines as string[]).includes(engineId),
     );
 }

@@ -7,7 +7,6 @@ import type { EngineId } from "../types/engine";
 const engines: { id: EngineId; label: string }[] = [
     { id: "sqlite", label: "SQLite" },
     { id: "pg", label: "PGlite" },
-    { id: "duckdb", label: "DuckDB" },
 ];
 
 export default function EngineSelect() {
