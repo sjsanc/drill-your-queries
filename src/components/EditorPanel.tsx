@@ -14,7 +14,7 @@ import type { Scenario } from "../types/scenario";
 import type { SchemaTable } from "../types/schema";
 import { formatQuery } from "../utils/formatQuery";
 import { shortcodeFromPrompt } from "../utils/shortcode";
-import Badge, { difficultyLabel, difficultyVariant } from "./Badge";
+import Badge from "./Badge";
 
 function conceptLabel(id: string): string {
     return CONCEPTS.find((c) => c.id === id)?.label ?? id;
@@ -80,9 +80,6 @@ export default function EditorPanel({
                             <div className="flex items-center gap-1.5 flex-wrap">
                                 <Badge variant="shortcode">
                                     {shortcodeFromPrompt(scenario.prompt)}
-                                </Badge>
-                                <Badge variant={difficultyVariant(scenario.difficulty)}>
-                                    {difficultyLabel(scenario.difficulty)}
                                 </Badge>
                                 {scenario.concepts.map((c) => (
                                     <Badge key={c} variant="concept">{conceptLabel(c)}</Badge>
