@@ -11,9 +11,9 @@ import { useDb } from "../context/DbContext";
 import type { QueryResult } from "../types/engine";
 import type { Scenario } from "../types/scenario";
 import type { SchemaTable } from "../types/schema";
-import { difficultyClass, difficultyLabel } from "../utils/difficultyDisplay";
 import { formatQuery } from "../utils/formatQuery";
 import { shortcodeFromPrompt } from "../utils/shortcode";
+import Badge, { difficultyLabel, difficultyVariant } from "./Badge";
 import Editor from "./Editor";
 
 interface EditorPanelProps {
@@ -73,33 +73,24 @@ export default function EditorPanel({
                     {scenario && (
                         <div className="flex-1 flex flex-col gap-1.5">
                             <div className="flex items-center gap-1.5 flex-wrap">
-                                <span className="text-sm font-mono px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300">
+                                <Badge variant="shortcode">
                                     {shortcodeFromPrompt(scenario.prompt)}
-                                </span>
-                                <span
-                                    className={`text-sm font-medium px-1.5 py-0.5 rounded ${difficultyClass(scenario.difficulty)}`}
-                                >
+                                </Badge>
+                                <Badge variant={difficultyVariant(scenario.difficulty)}>
                                     {difficultyLabel(scenario.difficulty)}
-                                </span>
+                                </Badge>
                                 {scenario.concepts.map((c) => (
-                                    <span
-                                        key={c}
-                                        className="text-sm px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-500"
-                                    >
-                                        {c}
-                                    </span>
+                                    <Badge key={c} variant="concept">{c}</Badge>
                                 ))}
                                 {isPassed && (
-                                    <span className="flex items-center gap-1 text-xs font-medium px-1.5 py-0.5 rounded bg-green-100 text-green-700">
-                                        <CheckIcon size={11} />
+                                    <Badge variant="passed" icon={<CheckIcon size={11} />}>
                                         Passed
-                                    </span>
+                                    </Badge>
                                 )}
                                 {revealed && !isPassed && (
-                                    <span className="flex items-center gap-1 text-xs font-medium px-1.5 py-0.5 rounded bg-amber-100 text-amber-700">
-                                        <EyeIcon size={11} />
+                                    <Badge variant="revealed" icon={<EyeIcon size={11} />}>
                                         Revealed
-                                    </span>
+                                    </Badge>
                                 )}
                             </div>
                             <p className="text-sm text-zinc-600">

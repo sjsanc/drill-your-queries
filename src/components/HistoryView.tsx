@@ -1,6 +1,7 @@
 import { CheckIcon, EyeIcon } from "lucide-react";
 import type { Scenario } from "../types/scenario";
 import { shortcodeFromPrompt } from "../utils/shortcode";
+import Badge from "./Badge";
 
 interface HistoryViewProps {
     scenarios: Scenario[];
@@ -29,32 +30,25 @@ export default function HistoryView({
                                 onClick={() => onJump(s)}
                                 className={`flex items-center gap-3 px-8 py-3 border-b-2 border-zinc-100 cursor-pointer hover:bg-zinc-50 transition-colors ${passed ? "" : "bg-zinc-50 hover:bg-zinc-100"}`}
                             >
-                                <span className="font-mono text-xs text-zinc-400 shrink-0">
+                                <Badge variant="shortcode">
                                     {shortcodeFromPrompt(s.prompt)}
-                                </span>
+                                </Badge>
                                 <span className="text-sm flex-1 text-zinc-700">
                                     {s.prompt}
                                 </span>
                                 {passed && (
-                                    <CheckIcon
-                                        size={14}
-                                        className="text-green-500 shrink-0"
-                                    />
+                                    <Badge variant="passed" icon={<CheckIcon size={11} />}>
+                                        Passed
+                                    </Badge>
                                 )}
                                 {revealed && (
-                                    <EyeIcon
-                                        size={14}
-                                        className="text-amber-400 shrink-0"
-                                    />
+                                    <Badge variant="revealed" icon={<EyeIcon size={11} />}>
+                                        Revealed
+                                    </Badge>
                                 )}
                                 <div className="flex items-center gap-1 flex-wrap justify-end">
                                     {s.concepts.map((c) => (
-                                        <span
-                                            key={c}
-                                            className="text-xs px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-400"
-                                        >
-                                            {c}
-                                        </span>
+                                        <Badge key={c} variant="concept">{c}</Badge>
                                     ))}
                                 </div>
                             </li>
