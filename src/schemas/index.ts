@@ -1,12 +1,13 @@
 import type { ISchemaDefinition } from "../types/schema-definition";
 import { ecommerceScenarios } from "./ecommerce.scenarios";
+import ecommercePgSql from "./ecommerce_pg.sql?raw";
 import ecommerceSql from "./ecommerce.sql?raw";
 import hrSql from "./hr.sql?raw";
 
 export const ecommerceSchema: ISchemaDefinition = {
     id: "ecommerce",
     name: "E-Commerce",
-    sql: ecommerceSql,
+    sql: { sqlite: ecommerceSql, pg: ecommercePgSql },
     scenarios: ecommerceScenarios,
 };
 

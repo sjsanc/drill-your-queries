@@ -794,7 +794,7 @@ export const ecommerceScenarios: Scenario[] = [
         concepts: ["subquery-correlated"],
         difficulty: 3,
         expectedSql:
-            "SELECT name FROM customers c WHERE (SELECT COUNT(*) FROM orders WHERE customer_id = c.id) > (SELECT AVG(cnt) FROM (SELECT COUNT(*) AS cnt FROM orders GROUP BY customer_id))",
+            "SELECT name FROM customers c WHERE (SELECT COUNT(*) FROM orders WHERE customer_id = c.id) > (SELECT AVG(cnt) FROM (SELECT COUNT(*) AS cnt FROM orders GROUP BY customer_id) AS t)",
     },
 
     // ── subquery-derived ────────────────────────────────────────────────────────
@@ -804,7 +804,7 @@ export const ecommerceScenarios: Scenario[] = [
         concepts: ["subquery-derived"],
         difficulty: 2,
         expectedSql:
-            "SELECT order_id, order_total FROM (SELECT order_id, SUM(quantity * unit_price) AS order_total FROM order_items GROUP BY order_id) WHERE order_total > 500",
+            "SELECT order_id, order_total FROM (SELECT order_id, SUM(quantity * unit_price) AS order_total FROM order_items GROUP BY order_id) AS t WHERE order_total > 500",
     },
     {
         id: "ecom-subquery-derived-2",
@@ -812,7 +812,7 @@ export const ecommerceScenarios: Scenario[] = [
         concepts: ["subquery-derived"],
         difficulty: 2,
         expectedSql:
-            "SELECT product_id, avg_rating FROM (SELECT product_id, AVG(rating) AS avg_rating FROM reviews GROUP BY product_id) WHERE avg_rating >= 4",
+            "SELECT product_id, avg_rating FROM (SELECT product_id, AVG(rating) AS avg_rating FROM reviews GROUP BY product_id) AS t WHERE avg_rating >= 4",
     },
     {
         id: "ecom-subquery-derived-3",
@@ -820,7 +820,7 @@ export const ecommerceScenarios: Scenario[] = [
         concepts: ["subquery-derived"],
         difficulty: 3,
         expectedSql:
-            "SELECT customer_id, total_spend FROM (SELECT o.customer_id, SUM(oi.quantity * oi.unit_price) AS total_spend FROM orders o JOIN order_items oi ON o.id = oi.order_id GROUP BY o.customer_id) WHERE total_spend > 1000",
+            "SELECT customer_id, total_spend FROM (SELECT o.customer_id, SUM(oi.quantity * oi.unit_price) AS total_spend FROM orders o JOIN order_items oi ON o.id = oi.order_id GROUP BY o.customer_id) AS t WHERE total_spend > 1000",
     },
 
     // ── exists ──────────────────────────────────────────────────────────────────
@@ -1045,6 +1045,7 @@ export const ecommerceScenarios: Scenario[] = [
         prompt: "Show each customer's name and join year as an integer using CAST and SUBSTR (name, join_year)",
         concepts: ["cast"],
         difficulty: 2,
+        engines: ["sqlite"],
         expectedSql:
             "SELECT name, CAST(SUBSTR(joined_at, 1, 4) AS INTEGER) AS join_year FROM customers",
     },
@@ -1463,6 +1464,7 @@ SELECT id, name FROM ancestors`,
         prompt: "Show each customer's name and the year they joined using strftime (name, join_year)",
         concepts: ["sqlite-strftime"],
         difficulty: 1,
+        engines: ["sqlite"],
         expectedSql:
             "SELECT name, strftime('%Y', joined_at) AS join_year FROM customers",
     },
@@ -1471,6 +1473,7 @@ SELECT id, name FROM ancestors`,
         prompt: "Show the number of orders placed each month (formatted as YYYY-MM) using strftime (month, order_count)",
         concepts: ["sqlite-strftime"],
         difficulty: 2,
+        engines: ["sqlite"],
         expectedSql:
             "SELECT strftime('%Y-%m', created_at) AS month, COUNT(*) AS order_count FROM orders GROUP BY strftime('%Y-%m', created_at)",
     },
@@ -1479,6 +1482,7 @@ SELECT id, name FROM ancestors`,
         prompt: "Show customers who joined before 2023 using strftime to extract the year (name, joined_at)",
         concepts: ["sqlite-strftime"],
         difficulty: 2,
+        engines: ["sqlite"],
         expectedSql:
             "SELECT name, joined_at FROM customers WHERE strftime('%Y', joined_at) < '2023'",
     },
@@ -1487,6 +1491,7 @@ SELECT id, name FROM ancestors`,
         prompt: "Show the number of reviews submitted each month using strftime (month, review_count)",
         concepts: ["sqlite-strftime"],
         difficulty: 2,
+        engines: ["sqlite"],
         expectedSql:
             "SELECT strftime('%Y-%m', created_at) AS month, COUNT(*) AS review_count FROM reviews GROUP BY strftime('%Y-%m', created_at)",
     },
@@ -1497,6 +1502,7 @@ SELECT id, name FROM ancestors`,
         prompt: "Build a JSON object for each product containing its id, name, and price using json_object (product_json)",
         concepts: ["sqlite-json"],
         difficulty: 2,
+        engines: ["sqlite"],
         expectedSql:
             "SELECT json_object('id', id, 'name', name, 'price', price) AS product_json FROM products",
     },
@@ -1505,6 +1511,7 @@ SELECT id, name FROM ancestors`,
         prompt: "Build a JSON array of all customer names using json_group_array (names)",
         concepts: ["sqlite-json"],
         difficulty: 2,
+        engines: ["sqlite"],
         expectedSql: "SELECT json_group_array(name) AS names FROM customers",
     },
     {
@@ -1512,7 +1519,119 @@ SELECT id, name FROM ancestors`,
         prompt: "Build a JSON object per product with name and stock, then extract the stock value back out using json_extract — aliased as extracted_stock (extracted_stock)",
         concepts: ["sqlite-json"],
         difficulty: 3,
+        engines: ["sqlite"],
         expectedSql:
             "SELECT json_extract(json_object('name', name, 'stock', stock), '$.stock') AS extracted_stock FROM products",
+    },
+
+    // ── pg-date ───────────────────────────────────────────────────────────────────
+    {
+        id: "ecom-pg-date-1",
+        prompt: "Show each customer's name and the year they joined using EXTRACT (name, join_year)",
+        concepts: ["pg-date"],
+        difficulty: 1,
+        engines: ["pg"],
+        expectedSql:
+            "SELECT name, EXTRACT(year FROM joined_at)::INTEGER AS join_year FROM customers",
+    },
+    {
+        id: "ecom-pg-date-2",
+        prompt: "Show the number of orders placed each month (formatted as YYYY-MM) using TO_CHAR (month, order_count)",
+        concepts: ["pg-date"],
+        difficulty: 2,
+        engines: ["pg"],
+        expectedSql:
+            "SELECT TO_CHAR(created_at, 'YYYY-MM') AS month, COUNT(*) AS order_count FROM orders GROUP BY TO_CHAR(created_at, 'YYYY-MM')",
+    },
+    {
+        id: "ecom-pg-date-3",
+        prompt: "Show customers who joined before 2023 using EXTRACT to get the year (name, joined_at)",
+        concepts: ["pg-date"],
+        difficulty: 2,
+        engines: ["pg"],
+        expectedSql:
+            "SELECT name, joined_at FROM customers WHERE EXTRACT(year FROM joined_at) < 2023",
+    },
+    {
+        id: "ecom-pg-date-4",
+        prompt: "Show the number of reviews submitted each month using TO_CHAR (month, review_count)",
+        concepts: ["pg-date"],
+        difficulty: 2,
+        engines: ["pg"],
+        expectedSql:
+            "SELECT TO_CHAR(created_at, 'YYYY-MM') AS month, COUNT(*) AS review_count FROM reviews GROUP BY TO_CHAR(created_at, 'YYYY-MM')",
+    },
+    {
+        id: "ecom-pg-date-5",
+        prompt: "Show each customer's name and join month number using EXTRACT (name, join_month)",
+        concepts: ["pg-date"],
+        difficulty: 1,
+        engines: ["pg"],
+        expectedSql:
+            "SELECT name, EXTRACT(month FROM joined_at)::INTEGER AS join_month FROM customers",
+    },
+    {
+        id: "ecom-pg-date-6",
+        prompt: "Show the number of orders placed in each year using DATE_TRUNC to bucket by year (year, order_count)",
+        concepts: ["pg-date"],
+        difficulty: 2,
+        engines: ["pg"],
+        expectedSql:
+            "SELECT DATE_TRUNC('year', created_at) AS year, COUNT(*) AS order_count FROM orders GROUP BY DATE_TRUNC('year', created_at) ORDER BY year",
+    },
+    {
+        id: "ecom-pg-date-7",
+        prompt: "Show orders placed in Q1 2024 (January–March) — use EXTRACT for year and month filtering (id, customer_id, status, created_at)",
+        concepts: ["pg-date"],
+        difficulty: 2,
+        engines: ["pg"],
+        expectedSql:
+            "SELECT id, customer_id, status, created_at FROM orders WHERE EXTRACT(year FROM created_at) = 2024 AND EXTRACT(month FROM created_at) BETWEEN 1 AND 3",
+    },
+
+    // ── pg-json ───────────────────────────────────────────────────────────────────
+    {
+        id: "ecom-pg-json-1",
+        prompt: "Build a JSON object for each product containing its id, name, and price using json_build_object (product_json)",
+        concepts: ["pg-json"],
+        difficulty: 2,
+        engines: ["pg"],
+        expectedSql:
+            "SELECT json_build_object('id', id, 'name', name, 'price', price) AS product_json FROM products",
+    },
+    {
+        id: "ecom-pg-json-2",
+        prompt: "Build a JSON array of all customer names using json_agg (names)",
+        concepts: ["pg-json"],
+        difficulty: 2,
+        engines: ["pg"],
+        expectedSql: "SELECT json_agg(name) AS names FROM customers",
+    },
+    {
+        id: "ecom-pg-json-3",
+        prompt: "Build a JSON object per product with name and stock, then extract the stock value back out as an integer using the ->> operator with a cast — aliased as extracted_stock (extracted_stock)",
+        concepts: ["pg-json"],
+        difficulty: 3,
+        engines: ["pg"],
+        expectedSql:
+            "SELECT (json_build_object('name', name, 'stock', stock)->>'stock')::INTEGER AS extracted_stock FROM products",
+    },
+    {
+        id: "ecom-pg-json-4",
+        prompt: "For each category, build a JSON array of all product names in that category using json_agg — show category_id and product_names",
+        concepts: ["pg-json"],
+        difficulty: 3,
+        engines: ["pg"],
+        expectedSql:
+            "SELECT category_id, json_agg(name ORDER BY name) AS product_names FROM products GROUP BY category_id",
+    },
+    {
+        id: "ecom-pg-json-5",
+        prompt: "Build a JSON object for each order with its id and status, then extract the status back out using ->> — aliased as order_status (order_status)",
+        concepts: ["pg-json"],
+        difficulty: 2,
+        engines: ["pg"],
+        expectedSql:
+            "SELECT (json_build_object('id', id, 'status', status)->>'status') AS order_status FROM orders",
     },
 ];

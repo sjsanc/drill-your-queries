@@ -105,7 +105,12 @@ export function DbProvider({
             await engineRef.current?.destroy();
             const next = makeEngine(engineId);
             await next.init();
-            await next.exec(schemaDef.sql);
+            const sql =
+                typeof schemaDef.sql === "string"
+                    ? schemaDef.sql
+                    : (schemaDef.sql[engineId] ??
+                      (Object.values(schemaDef.sql)[0] as string));
+            await next.exec(sql);
             const schema = await next.introspect();
             engineRef.current = next;
             dispatch({ type: "INIT_DONE", schema });

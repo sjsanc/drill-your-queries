@@ -8,12 +8,17 @@ import {
     WandSparklesIcon,
 } from "lucide-react";
 import { useDb } from "../context/DbContext";
+import { CONCEPTS } from "../types/concepts";
 import type { QueryResult } from "../types/engine";
 import type { Scenario } from "../types/scenario";
 import type { SchemaTable } from "../types/schema";
 import { formatQuery } from "../utils/formatQuery";
 import { shortcodeFromPrompt } from "../utils/shortcode";
 import Badge, { difficultyLabel, difficultyVariant } from "./Badge";
+
+function conceptLabel(id: string): string {
+    return CONCEPTS.find((c) => c.id === id)?.label ?? id;
+}
 import Editor from "./Editor";
 
 interface EditorPanelProps {
@@ -80,7 +85,7 @@ export default function EditorPanel({
                                     {difficultyLabel(scenario.difficulty)}
                                 </Badge>
                                 {scenario.concepts.map((c) => (
-                                    <Badge key={c} variant="concept">{c}</Badge>
+                                    <Badge key={c} variant="concept">{conceptLabel(c)}</Badge>
                                 ))}
                                 {isPassed && (
                                     <Badge variant="passed" icon={<CheckIcon size={11} />}>

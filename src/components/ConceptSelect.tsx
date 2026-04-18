@@ -1,17 +1,32 @@
 import * as Popover from "@radix-ui/react-popover";
 import { ChevronDownIcon, LightbulbIcon } from "lucide-react";
 import { CONCEPT_GROUPS, type ConceptId } from "../types/concepts";
+import type { EngineId } from "../types/engine";
 
 interface ConceptSelectProps {
     selected: ConceptId[];
     onChange: (ids: ConceptId[]) => void;
+    engineId: EngineId;
 }
 
 export default function ConceptSelect({
     selected,
     onChange,
+    engineId,
 }: ConceptSelectProps) {
-    const isFiltered = selected.length > 0;
+    const visibleGroups = CONCEPT_GROUPS.map((group) => ({
+        ...group,
+        concepts: group.concepts.filter(
+            (c) => c.engine === "generic" || c.engine === engineId,
+        ),
+    })).filter((g) => g.concepts.length > 0);
+
+    const visibleIds = new Set(
+        visibleGroups.flatMap((g) => g.concepts.map((c) => c.id)),
+    );
+    const activeSelected = selected.filter((id) => visibleIds.has(id));
+    const isFiltered = activeSelected.length > 0;
+    const allSelected = visibleIds.size > 0 && activeSelected.length === visibleIds.size;
 
     function toggle(id: ConceptId) {
         onChange(
@@ -19,6 +34,10 @@ export default function ConceptSelect({
                 ? selected.filter((s) => s !== id)
                 : [...selected, id],
         );
+    }
+
+    function selectAll() {
+        onChange([...visibleIds] as ConceptId[]);
     }
 
     return (
@@ -34,7 +53,7 @@ export default function ConceptSelect({
                     Focus
                     {isFiltered && (
                         <span className="bg-purple-600 text-white text-xs font-medium px-1.5 py-0.5 rounded-full leading-none">
-                            {selected.length}
+                            {activeSelected.length}
                         </span>
                     )}
                     <ChevronDownIcon size={13} />
@@ -52,17 +71,26 @@ export default function ConceptSelect({
                         <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wide">
                             Focus concepts
                         </span>
-                        <button
-                            onClick={() => onChange([])}
-                            disabled={!isFiltered}
-                            className="text-xs text-zinc-400 hover:text-zinc-200 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
-                        >
-                            Reset
-                        </button>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={selectAll}
+                                disabled={allSelected}
+                                className="text-xs text-zinc-400 hover:text-zinc-200 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                            >
+                                All
+                            </button>
+                            <button
+                                onClick={() => onChange([])}
+                                disabled={!isFiltered}
+                                className="text-xs text-zinc-400 hover:text-zinc-200 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                            >
+                                Reset
+                            </button>
+                        </div>
                     </div>
 
                     <div className="overflow-y-auto max-h-96">
-                        {CONCEPT_GROUPS.map((group) => {
+                        {visibleGroups.map((group) => {
                             const groupIds = group.concepts.map(
                                 (c) => c.id,
                             ) as ConceptId[];

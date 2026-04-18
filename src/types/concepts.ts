@@ -10,6 +10,7 @@ export const CATEGORY_ORDER = [
     "CTEs",
     "Window Functions",
     "SQLite",
+    "PostgreSQL",
 ] as const;
 
 export type ConceptCategory = (typeof CATEGORY_ORDER)[number];
@@ -328,6 +329,19 @@ export const CONCEPTS = [
         label: "PRAGMA statements",
         engine: "sqlite",
         category: "SQLite",
+    },
+
+    {
+        id: "pg-date",
+        label: "EXTRACT(), DATE_TRUNC(), TO_CHAR()",
+        engine: "pg",
+        category: "PostgreSQL",
+    },
+    {
+        id: "pg-json",
+        label: "json_build_object(), json_agg(), ->> operator",
+        engine: "pg",
+        category: "PostgreSQL",
     },
 ] as const;
 

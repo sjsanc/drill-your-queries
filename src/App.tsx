@@ -16,10 +16,11 @@ import SchemaSidebar from "./components/SchemaSidebar";
 import { DbProvider, useDb } from "./context/DbContext";
 import { useLocalStorage } from "./hooks/useLocalStorage";
 import { ecommerceSchema } from "./schemas";
-import type { ConceptId } from "./types/concepts";
-import type { QueryResult } from "./types/engine";
+import { CONCEPTS, type ConceptId } from "./types/concepts";
+import type { EngineId, QueryResult } from "./types/engine";
 import type { Scenario } from "./types/scenario";
 import { compareResults } from "./utils/compareResults";
+import { filterScenariosForEngine } from "./utils/filterScenarios";
 import { formatQuery } from "./utils/formatQuery";
 import { pickRandom } from "./utils/scenarioSelection";
 import { shortcodeFromPrompt } from "./utils/shortcode";
@@ -70,12 +71,29 @@ function Shell() {
     );
     const [passed, setPassed] = useState<boolean | null>(null);
 
-    const allScenarios = schemaDef?.scenarios ?? [];
+    const allScenarios = useMemo(
+        () =>
+            filterScenariosForEngine(
+                schemaDef?.scenarios ?? [],
+                engineId as EngineId,
+            ),
+        [schemaDef?.scenarios, engineId],
+    );
+
+    const validConceptIds = useMemo(() => {
+        const id = engineId as EngineId;
+        return new Set(
+            CONCEPTS.filter((c) => c.engine === "generic" || c.engine === id).map(
+                (c) => c.id,
+            ),
+        );
+    }, [engineId]);
 
     const scenarioPool = useMemo(() => {
-        if (selectedConcepts.length === 0) return allScenarios;
+        const active = selectedConcepts.filter((c) => validConceptIds.has(c));
+        if (active.length === 0) return allScenarios;
         const filtered = allScenarios.filter((s) =>
-            s.concepts.some((c) => selectedConcepts.includes(c)),
+            s.concepts.some((c) => active.includes(c)),
         );
         return filtered.length > 0 ? filtered : allScenarios;
     }, [allScenarios, selectedConcepts]);
@@ -150,6 +168,13 @@ function Shell() {
         setResult(null);
         setError(null);
         setRevealed(false);
+        setSelectedConcepts([]);
+        setScenario((current) => {
+            if (current?.engines && !current.engines.includes(engineId as EngineId)) {
+                return pickRandom(allScenarios, null, passedIds);
+            }
+            return current;
+        });
     }, [engineId, schemaDef?.id]);
 
     function handleResult(r: QueryResult) {
@@ -232,6 +257,7 @@ function Shell() {
                 <ConceptSelect
                     selected={selectedConcepts}
                     onChange={setSelectedConcepts}
+                    engineId={engineId as EngineId}
                 />
                 <SchemaSelect />
                 <EngineSelect />
