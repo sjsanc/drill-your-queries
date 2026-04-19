@@ -37,7 +37,7 @@ export default function HistoryView({
                 <Accordion.Root type="multiple" className="w-full">
                     {scenariosByCategory.map(({ category, scenarios: group }) => {
                         const passedCount = group.filter((s) =>
-                            passedIds.includes(s.id),
+                            passedIds.includes(shortcodeFromPrompt(s.prompt)),
                         ).length;
 
                         return (
@@ -61,13 +61,14 @@ export default function HistoryView({
                                 <Accordion.Content className="overflow-hidden data-[state=open]:animate-accordion-down data-[state=closed]:animate-accordion-up">
                                     <ul>
                                         {group.map((s) => {
-                                            const passed = passedIds.includes(s.id);
+                                            const key = shortcodeFromPrompt(s.prompt);
+                                            const passed = passedIds.includes(key);
                                             const revealed =
                                                 !passed &&
-                                                revealedIds.includes(s.id);
+                                                revealedIds.includes(key);
                                             return (
                                                 <li
-                                                    key={s.id}
+                                                    key={key}
                                                     onClick={() => onJump(s)}
                                                     className={`flex items-center gap-3 px-8 py-2.5 border-t border-zinc-100 cursor-pointer hover:bg-zinc-50 transition-colors ${passed ? "" : "bg-zinc-50 hover:bg-zinc-100"}`}
                                                 >

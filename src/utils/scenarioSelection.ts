@@ -1,4 +1,5 @@
 import type { Scenario } from "../types/scenario";
+import { shortcodeFromPrompt } from "./shortcode";
 
 export function pickRandom(
     scenarios: Scenario[],
@@ -8,7 +9,9 @@ export function pickRandom(
     if (!scenarios.length) return null;
     const pool = exclude ? scenarios.filter((s) => s !== exclude) : scenarios;
     if (!pool.length) return exclude;
-    const untested = pool.filter((s) => !passedIds.includes(s.id));
+    const untested = pool.filter(
+        (s) => !passedIds.includes(shortcodeFromPrompt(s.prompt)),
+    );
     const candidates = untested.length ? untested : pool;
     return candidates[Math.floor(Math.random() * candidates.length)];
 }

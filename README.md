@@ -1,5 +1,7 @@
 # Drill Your Queries
 
+<img src="screenshot-1776601671.png" style="width: 1080px;" />
+
 A website to help you get better at SQL. You're given a bunch of straightforward scenarios to test a specific concept or concepts. By writing similar variants of the same query you build familiarity and muscle memory. 
 
 Scenarios are grouped by concept (selects, joins, CTEs etc.), engine (SQLite, PGLite, DuckDb), and schema (Ecommerce, HR etc.). 

@@ -71,6 +71,8 @@ function Shell() {
     );
     const [passed, setPassed] = useState<boolean | null>(null);
 
+    const scenarioKey = (s: Scenario) => shortcodeFromPrompt(s.prompt);
+
     const allScenarios = useMemo(
         () =>
             filterScenariosForEngine(
@@ -108,7 +110,7 @@ function Shell() {
               )
             : null;
         const fromStorage = currentScenarioId
-            ? allScenarios.find((s) => s.id === currentScenarioId)
+            ? allScenarios.find((s) => scenarioKey(s) === currentScenarioId)
             : null;
         setScenario(
             fromUrl ?? fromStorage ?? pickRandom(allScenarios, null, passedIds),
@@ -130,8 +132,8 @@ function Shell() {
     }, [schemaDef?.id]);
 
     useEffect(() => {
-        if (scenario) setCurrentScenarioId(scenario.id);
-    }, [scenario?.id]);
+        if (scenario) setCurrentScenarioId(scenarioKey(scenario));
+    }, [scenario?.prompt]);
 
     useEffect(() => {
         setResult(null);
@@ -152,9 +154,9 @@ function Shell() {
             passed === true &&
             !revealed &&
             scenario &&
-            !passedIds.includes(scenario.id)
+            !passedIds.includes(scenarioKey(scenario))
         ) {
-            setPassedIds((prev) => [...prev, scenario.id]);
+            setPassedIds((prev) => [...prev, scenarioKey(scenario)]);
         }
     }, [passed]);
 
@@ -199,8 +201,8 @@ function Shell() {
             /* leave as-is */
         }
         setQueryText(sql);
-        if (!revealedIds.includes(scenario.id)) {
-            setRevealedIds((prev) => [...prev, scenario.id]);
+        if (!revealedIds.includes(scenarioKey(scenario))) {
+            setRevealedIds((prev) => [...prev, scenarioKey(scenario)]);
         }
     }
 
@@ -208,7 +210,7 @@ function Shell() {
         if (scenario && passed !== true) {
             setSkippedCounts((prev) => ({
                 ...prev,
-                [scenario.id]: (prev[scenario.id] ?? 0) + 1,
+                [scenarioKey(scenario)]: (prev[scenarioKey(scenario)] ?? 0) + 1,
             }));
         }
         setQueryText("");
