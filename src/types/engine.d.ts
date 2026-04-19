@@ -1,4 +1,4 @@
-import type { SchemaTable } from "./schema";
+import type { SchemaTable } from "@/types/schema";
 
 export type EngineId = "sqlite" | "pg" | "duckdb";
 

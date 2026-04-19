@@ -1,5 +1,5 @@
-import { ecommerceSchema } from "./ecommerce";
-import { hrSchema } from "./hr";
+import { ecommerceSchema } from "@/data/ecommerce";
+import { hrSchema } from "@/data/hr";
 
 export { ecommerceSchema };
 

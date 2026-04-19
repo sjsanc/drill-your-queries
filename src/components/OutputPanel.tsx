@@ -1,10 +1,10 @@
 import { CheckIcon } from "lucide-react";
 import { Group, Panel, Separator } from "react-resizable-panels";
-import type { QueryResult } from "../types/engine";
+import type { QueryResult } from "@/types/engine";
 import {
     type DetailedComparison,
     detailedComparison,
-} from "../utils/compareResults";
+} from "@/utils/compareResults";
 
 interface OutputPanelProps {
     result: QueryResult | null;

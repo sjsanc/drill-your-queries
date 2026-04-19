@@ -18,9 +18,9 @@ import {
 } from "@codemirror/view";
 import { tags } from "@lezer/highlight";
 import { useEffect, useRef } from "react";
-import type { EngineId } from "../types/engine";
-import type { SchemaTable } from "../types/schema";
-import { formatQuery } from "../utils/formatQuery";
+import type { EngineId } from "@/types/engine";
+import type { SchemaTable } from "@/types/schema";
+import { formatQuery } from "@/utils/formatQuery";
 
 interface EditorProps {
     value: string;

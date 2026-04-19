@@ -1,4 +1,4 @@
-import type { ConceptId, EngineTag } from "./concepts";
+import type { ConceptId, EngineTag } from "@/types/concepts";
 
 export interface Scenario {
     prompt: string;

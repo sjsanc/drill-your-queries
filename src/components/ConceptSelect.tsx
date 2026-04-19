@@ -1,7 +1,7 @@
 import * as Popover from "@radix-ui/react-popover";
 import { ChevronDownIcon, LightbulbIcon } from "lucide-react";
-import { CONCEPT_GROUPS, type ConceptId } from "../types/concepts";
-import type { EngineId } from "../types/engine";
+import { CONCEPT_GROUPS, type ConceptId } from "@/types/concepts";
+import type { EngineId } from "@/types/engine";
 
 interface ConceptSelectProps {
     selected: ConceptId[];

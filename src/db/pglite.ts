@@ -1,6 +1,6 @@
 import { PGlite } from "@electric-sql/pglite";
-import type { IDbEngine, QueryResult } from "../types/engine";
-import type { SchemaTable } from "../types/schema";
+import type { IDbEngine, QueryResult } from "@/types/engine";
+import type { SchemaTable } from "@/types/schema";
 
 export class PgliteEngine implements IDbEngine {
     readonly id = "pg" as const;

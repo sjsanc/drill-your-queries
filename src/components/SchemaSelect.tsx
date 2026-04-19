@@ -1,7 +1,7 @@
 import * as Select from "@radix-ui/react-select";
 import { ChevronDownIcon, Table2Icon } from "lucide-react";
-import { useDb } from "../db/DbContext";
-import { schemas } from "../data";
+import { useDb } from "@/db/DbContext";
+import { schemas } from "@/data";
 
 export default function SchemaSelect() {
     const { schemaDef, status, loadSchema } = useDb();

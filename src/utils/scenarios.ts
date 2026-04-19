@@ -1,5 +1,5 @@
-import type { EngineId } from "../types/engine";
-import type { Scenario } from "../types/scenario";
+import type { EngineId } from "@/types/engine";
+import type { Scenario } from "@/types/scenario";
 
 /** Deterministic 6-character hash of a scenario prompt used as a stable identifier. */
 export function shortcodeFromPrompt(prompt: string): string {

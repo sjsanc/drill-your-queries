@@ -1,4 +1,4 @@
-import type { Scenario } from "../../types/scenario";
+import type { Scenario } from "@/types/scenario";
 
 export const hrScenarios: Scenario[] = [
     // ── select-basic ────────────────────────────────────────────────────────────

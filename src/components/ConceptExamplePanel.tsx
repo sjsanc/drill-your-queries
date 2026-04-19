@@ -1,7 +1,7 @@
 import { XIcon } from "lucide-react";
-import { CONCEPTS } from "../types/concepts";
-import type { ConceptId } from "../types/concepts";
-import Editor from "./Editor";
+import { CONCEPTS } from "@/types/concepts";
+import type { ConceptId } from "@/types/concepts";
+import Editor from "@/components/Editor";
 
 interface ConceptExamplePanelProps {
     conceptId: ConceptId;

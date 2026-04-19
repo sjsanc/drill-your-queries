@@ -9,21 +9,21 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Group, Panel, Separator } from "react-resizable-panels";
-import { useDb } from "../db/DbContext";
-import { CONCEPTS } from "../types/concepts";
-import type { ConceptId } from "../types/concepts";
-import type { QueryResult } from "../types/engine";
-import type { Scenario } from "../types/scenario";
-import type { SchemaTable } from "../types/schema";
-import { formatQuery } from "../utils/formatQuery";
-import { shortcodeFromPrompt } from "../utils/scenarios";
-import Badge from "./Badge";
-import ConceptExamplePanel from "./ConceptExamplePanel";
+import { useDb } from "@/db/DbContext";
+import { CONCEPTS } from "@/types/concepts";
+import type { ConceptId } from "@/types/concepts";
+import type { QueryResult } from "@/types/engine";
+import type { Scenario } from "@/types/scenario";
+import type { SchemaTable } from "@/types/schema";
+import { formatQuery } from "@/utils/formatQuery";
+import { shortcodeFromPrompt } from "@/utils/scenarios";
+import Badge from "@/components/Badge";
+import ConceptExamplePanel from "@/components/ConceptExamplePanel";
 
 function conceptLabel(id: string): string {
     return CONCEPTS.find((c) => c.id === id)?.label ?? id;
 }
-import Editor from "./Editor";
+import Editor from "@/components/Editor";
 
 interface EditorPanelProps {
     value: string;

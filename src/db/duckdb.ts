@@ -1,7 +1,7 @@
 import type { AsyncDuckDBConnection } from "@duckdb/duckdb-wasm";
 import * as duckdb from "@duckdb/duckdb-wasm";
-import type { IDbEngine, QueryResult } from "../types/engine";
-import type { SchemaTable } from "../types/schema";
+import type { IDbEngine, QueryResult } from "@/types/engine";
+import type { SchemaTable } from "@/types/schema";
 
 export class DuckdbEngine implements IDbEngine {
     readonly id = "duckdb" as const;

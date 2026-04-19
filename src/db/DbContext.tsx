@@ -5,12 +5,12 @@ import {
     useReducer,
     useRef,
 } from "react";
-import { useLocalStorage } from "../hooks/useLocalStorage";
-import { schemas } from "../data";
-import type { EngineId, IDbEngine, QueryResult } from "../types/engine";
-import type { SchemaTable } from "../types/schema";
-import type { ISchemaDefinition } from "../types/schema-definition";
-import { STORAGE_KEYS } from "../utils/storageKeys";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { schemas } from "@/data";
+import type { EngineId, IDbEngine, QueryResult } from "@/types/engine";
+import type { SchemaTable } from "@/types/schema";
+import type { ISchemaDefinition } from "@/types/schema-definition";
+import { STORAGE_KEYS } from "@/utils/storageKeys";
 
 interface DbState {
     engineId: EngineId;
@@ -62,14 +62,14 @@ interface DbProviderProps {
 
 async function makeEngine(id: EngineId): Promise<IDbEngine> {
     if (id === "sqlite") {
-        const { SqliteEngine } = await import("../db/sqlite");
+        const { SqliteEngine } = await import("@/db/sqlite");
         return new SqliteEngine();
     }
     if (id === "pg") {
-        const { PgliteEngine } = await import("../db/pglite");
+        const { PgliteEngine } = await import("@/db/pglite");
         return new PgliteEngine();
     }
-    const { DuckdbEngine } = await import("../db/duckdb");
+    const { DuckdbEngine } = await import("@/db/duckdb");
     return new DuckdbEngine();
 }
 

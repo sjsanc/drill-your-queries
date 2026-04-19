@@ -1,4 +1,4 @@
-import type { QueryResult } from "../types/engine";
+import type { QueryResult } from "@/types/engine";
 
 const serialize = (row: Record<string, unknown>) =>
     JSON.stringify(Object.fromEntries([...Object.entries(row)].sort()));

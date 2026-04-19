@@ -1,15 +1,15 @@
 import { useEffect, useMemo, useState } from "react";
-import { useDb } from "../db/DbContext";
-import { useLocalStorage } from "./useLocalStorage";
-import { CONCEPTS, type ConceptId } from "../types/concepts";
-import type { EngineId, QueryResult } from "../types/engine";
-import type { Scenario } from "../types/scenario";
-import type { SM2Store } from "../types/spacedRepetition";
-import { compareResults } from "../utils/compareResults";
-import { filterScenariosForEngine, shortcodeFromPrompt } from "../utils/scenarios";
-import { formatQuery } from "../utils/formatQuery";
-import { pickWithSR, sm2Key, updateSM2 } from "../utils/spacedRepetition";
-import { STORAGE_KEYS } from "../utils/storageKeys";
+import { useDb } from "@/db/DbContext";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
+import { CONCEPTS, type ConceptId } from "@/types/concepts";
+import type { EngineId, QueryResult } from "@/types/engine";
+import type { Scenario } from "@/types/scenario";
+import type { SM2Store } from "@/types/spacedRepetition";
+import { compareResults } from "@/utils/compareResults";
+import { filterScenariosForEngine, shortcodeFromPrompt } from "@/utils/scenarios";
+import { formatQuery } from "@/utils/formatQuery";
+import { pickWithSR, sm2Key, updateSM2 } from "@/utils/spacedRepetition";
+import { STORAGE_KEYS } from "@/utils/storageKeys";
 
 export function useScenario() {
     const { engineId, schemaDef, status, query } = useDb();

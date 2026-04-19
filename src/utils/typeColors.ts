@@ -1,4 +1,4 @@
-import type { EngineId } from "../types/engine";
+import type { EngineId } from "@/types/engine";
 
 type ColorMap = Record<string, string>;
 

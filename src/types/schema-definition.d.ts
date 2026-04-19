@@ -1,5 +1,5 @@
-import type { EngineId } from "./engine";
-import type { Scenario } from "./scenario";
+import type { EngineId } from "@/types/engine";
+import type { Scenario } from "@/types/scenario";
 
 export interface ISchemaDefinition {
     id: string;

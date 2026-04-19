@@ -1,8 +1,8 @@
 import type { Database } from "sql.js";
 import initSqlJs from "sql.js";
 import sqlWasm from "sql.js/dist/sql-wasm.wasm?url";
-import type { IDbEngine, QueryResult } from "../types/engine";
-import type { SchemaTable } from "../types/schema";
+import type { IDbEngine, QueryResult } from "@/types/engine";
+import type { SchemaTable } from "@/types/schema";
 
 export class SqliteEngine implements IDbEngine {
     readonly id = "sqlite" as const;

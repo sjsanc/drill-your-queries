@@ -1,6 +1,6 @@
-import type { Scenario } from "../types/scenario";
-import type { SM2Grade, SM2Record, SM2Store } from "../types/spacedRepetition";
-import { shortcodeFromPrompt } from "./scenarios";
+import type { Scenario } from "@/types/scenario";
+import type { SM2Grade, SM2Record, SM2Store } from "@/types/spacedRepetition";
+import { shortcodeFromPrompt } from "@/utils/scenarios";
 
 /** Composite key scoping an SM2 record to a specific schema. */
 export function sm2Key(schemaId: string, shortcode: string): string {

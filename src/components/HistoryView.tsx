@@ -1,11 +1,11 @@
 import * as Accordion from "@radix-ui/react-accordion";
 import { CheckIcon, ChevronDownIcon, EyeIcon } from "lucide-react";
-import { CONCEPTS, CONCEPT_GROUPS } from "../types/concepts";
-import type { Scenario } from "../types/scenario";
-import type { SM2Store } from "../types/spacedRepetition";
-import { sm2Key } from "../utils/spacedRepetition";
-import { shortcodeFromPrompt } from "../utils/scenarios";
-import Badge from "./Badge";
+import { CONCEPTS, CONCEPT_GROUPS } from "@/types/concepts";
+import type { Scenario } from "@/types/scenario";
+import type { SM2Store } from "@/types/spacedRepetition";
+import { sm2Key } from "@/utils/spacedRepetition";
+import { shortcodeFromPrompt } from "@/utils/scenarios";
+import Badge from "@/components/Badge";
 
 interface HistoryViewProps {
     scenarios: Scenario[];

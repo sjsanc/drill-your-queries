@@ -5,18 +5,18 @@ import {
     Separator,
     useDefaultLayout,
 } from "react-resizable-panels";
-import ConceptSelect from "./components/ConceptSelect";
-import EditorPanel from "./components/EditorPanel";
-import EngineSelect from "./components/EngineSelect";
-import HistoryView from "./components/HistoryView";
-import OutputPanel from "./components/OutputPanel";
-import SchemaSelect from "./components/SchemaSelect";
-import SchemaSidebar from "./components/SchemaSidebar";
-import { DbProvider, useDb } from "./db/DbContext";
-import { useScenario } from "./hooks/useScenario";
-import { ecommerceSchema } from "./data";
-import type { EngineId } from "./types/engine";
-import { STORAGE_KEYS } from "./utils/storageKeys";
+import ConceptSelect from "@/components/ConceptSelect";
+import EditorPanel from "@/components/EditorPanel";
+import EngineSelect from "@/components/EngineSelect";
+import HistoryView from "@/components/HistoryView";
+import OutputPanel from "@/components/OutputPanel";
+import SchemaSelect from "@/components/SchemaSelect";
+import SchemaSidebar from "@/components/SchemaSidebar";
+import { DbProvider, useDb } from "@/db/DbContext";
+import { useScenario } from "@/hooks/useScenario";
+import { ecommerceSchema } from "@/data";
+import type { EngineId } from "@/types/engine";
+import { STORAGE_KEYS } from "@/utils/storageKeys";
 
 function LoadingOverlay({ engineId }: { engineId: string }) {
     return (
