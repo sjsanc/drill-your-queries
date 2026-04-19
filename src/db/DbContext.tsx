@@ -6,7 +6,7 @@ import {
     useRef,
 } from "react";
 import { useLocalStorage } from "../hooks/useLocalStorage";
-import { schemas } from "../schemas";
+import { schemas } from "../data";
 import type { EngineId, IDbEngine, QueryResult } from "../types/engine";
 import type { SchemaTable } from "../types/schema";
 import type { ISchemaDefinition } from "../types/schema-definition";

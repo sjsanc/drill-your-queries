@@ -53,6 +53,7 @@ const engineColorMaps: Record<EngineId, ColorMap> = {
     duckdb: duckdbColors,
 };
 
+/** Returns the Tailwind text-color class for a SQL column type in the given engine. */
 export function getTypeColor(engine: EngineId, type: string): string {
     const map = engineColorMaps[engine];
     const normalized = type.toUpperCase().split("(")[0].trim();

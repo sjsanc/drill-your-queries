@@ -1,6 +1,6 @@
 import { ChevronDown, ChevronRight, ChevronsUpDown } from "lucide-react";
 import { useState } from "react";
-import { useDb } from "../context/DbContext";
+import { useDb } from "../db/DbContext";
 import type { EngineId } from "../types/engine";
 import type { SchemaTable } from "../types/schema";
 import { getTypeColor } from "../utils/typeColors";

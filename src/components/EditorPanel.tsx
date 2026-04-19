@@ -9,15 +9,14 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Group, Panel, Separator } from "react-resizable-panels";
-import { useDb } from "../context/DbContext";
-import { CONCEPT_EXAMPLES } from "../lib/conceptExamples";
+import { useDb } from "../db/DbContext";
 import { CONCEPTS } from "../types/concepts";
 import type { ConceptId } from "../types/concepts";
 import type { QueryResult } from "../types/engine";
 import type { Scenario } from "../types/scenario";
 import type { SchemaTable } from "../types/schema";
 import { formatQuery } from "../utils/formatQuery";
-import { shortcodeFromPrompt } from "../utils/shortcode";
+import { shortcodeFromPrompt } from "../utils/scenarios";
 import Badge from "./Badge";
 import ConceptExamplePanel from "./ConceptExamplePanel";
 
@@ -61,7 +60,7 @@ export default function EditorPanel({
     }, [scenario]);
 
     function handleConceptClick(id: ConceptId) {
-        if (!(id in CONCEPT_EXAMPLES)) return;
+        if (!CONCEPTS.find((c) => c.id === id)?.example) return;
         setActiveConcept((prev) => (prev === id ? null : id));
     }
 
@@ -101,7 +100,7 @@ export default function EditorPanel({
                                     {shortcodeFromPrompt(scenario.prompt)}
                                 </Badge>
                                 {scenario.concepts.map((c) => {
-                                    const hasExample = c in CONCEPT_EXAMPLES;
+                                    const hasExample = !!CONCEPTS.find((concept) => concept.id === c)?.example;
                                     const isActive = activeConcept === c;
                                     return (
                                         <Badge

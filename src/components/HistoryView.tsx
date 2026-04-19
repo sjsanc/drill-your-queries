@@ -4,7 +4,7 @@ import { CONCEPTS, CONCEPT_GROUPS } from "../types/concepts";
 import type { Scenario } from "../types/scenario";
 import type { SM2Store } from "../types/spacedRepetition";
 import { sm2Key } from "../utils/spacedRepetition";
-import { shortcodeFromPrompt } from "../utils/shortcode";
+import { shortcodeFromPrompt } from "../utils/scenarios";
 import Badge from "./Badge";
 
 interface HistoryViewProps {

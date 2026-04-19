@@ -1,7 +1,7 @@
 import * as Select from "@radix-ui/react-select";
 import { ChevronDownIcon, DatabaseIcon } from "lucide-react";
-import { useDb } from "../context/DbContext";
-import { ecommerceSchema } from "../schemas";
+import { useDb } from "../db/DbContext";
+import { ecommerceSchema } from "../data";
 import type { EngineId } from "../types/engine";
 
 const engines: { id: EngineId; label: string }[] = [

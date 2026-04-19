@@ -1,7 +1,6 @@
 import { XIcon } from "lucide-react";
 import { CONCEPTS } from "../types/concepts";
 import type { ConceptId } from "../types/concepts";
-import { CONCEPT_EXAMPLES } from "../lib/conceptExamples";
 import Editor from "./Editor";
 
 interface ConceptExamplePanelProps {
@@ -11,9 +10,8 @@ interface ConceptExamplePanelProps {
 
 export default function ConceptExamplePanel({ conceptId, onClose }: ConceptExamplePanelProps) {
     const concept = CONCEPTS.find((c) => c.id === conceptId);
-    const example = CONCEPT_EXAMPLES[conceptId];
 
-    if (!concept || !example) return null;
+    if (!concept?.example) return null;
 
     return (
         <div className="h-full flex flex-col bg-zinc-50 border-t border-zinc-200">
@@ -31,10 +29,10 @@ export default function ConceptExamplePanel({ conceptId, onClose }: ConceptExamp
                     <XIcon size={14} />
                 </button>
             </div>
-            <p className="text-xs text-zinc-500 px-3 pt-2 pb-1 shrink-0">{example.description}</p>
+            <p className="text-xs text-zinc-500 px-3 pt-2 pb-1 shrink-0">{concept.example.description}</p>
             <div className="flex-1 min-h-0">
                 <Editor
-                    value={example.sql}
+                    value={concept.example.sql}
                     engineId="sqlite"
                     readonly
                 />
