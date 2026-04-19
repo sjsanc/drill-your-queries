@@ -7,14 +7,19 @@ import {
     StepForwardIcon,
     WandSparklesIcon,
 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Group, Panel, Separator } from "react-resizable-panels";
 import { useDb } from "../context/DbContext";
+import { CONCEPT_EXAMPLES } from "../lib/conceptExamples";
 import { CONCEPTS } from "../types/concepts";
+import type { ConceptId } from "../types/concepts";
 import type { QueryResult } from "../types/engine";
 import type { Scenario } from "../types/scenario";
 import type { SchemaTable } from "../types/schema";
 import { formatQuery } from "../utils/formatQuery";
 import { shortcodeFromPrompt } from "../utils/shortcode";
 import Badge from "./Badge";
+import ConceptExamplePanel from "./ConceptExamplePanel";
 
 function conceptLabel(id: string): string {
     return CONCEPTS.find((c) => c.id === id)?.label ?? id;
@@ -49,9 +54,19 @@ export default function EditorPanel({
     onReveal,
 }: EditorPanelProps) {
     const { query, status, engineId } = useDb();
+    const [activeConcept, setActiveConcept] = useState<ConceptId | null>(null);
+
+    useEffect(() => {
+        setActiveConcept(null);
+    }, [scenario]);
+
+    function handleConceptClick(id: ConceptId) {
+        if (!(id in CONCEPT_EXAMPLES)) return;
+        setActiveConcept((prev) => (prev === id ? null : id));
+    }
 
     const isPassed = scenario
-        ? passed === true || passedIds.includes(scenario.id)
+        ? passed === true || passedIds.includes(shortcodeFromPrompt(scenario.prompt))
         : false;
 
     function handleFormat() {
@@ -62,9 +77,13 @@ export default function EditorPanel({
         }
     }
 
-    async function handleRun() {
+    async function handleRun(sql?: string) {
+        if (passed === true) {
+            onSkip();
+            return;
+        }
         try {
-            const result = await query(value);
+            const result = await query(sql ?? value);
             onResult(result);
         } catch (e) {
             onError(String(e));
@@ -81,17 +100,26 @@ export default function EditorPanel({
                                 <Badge variant="shortcode">
                                     {shortcodeFromPrompt(scenario.prompt)}
                                 </Badge>
-                                {scenario.concepts.map((c) => (
-                                    <Badge key={c} variant="concept">{conceptLabel(c)}</Badge>
-                                ))}
-                                {isPassed && (
-                                    <Badge variant="passed" icon={<CheckIcon size={11} />}>
-                                        Passed
-                                    </Badge>
-                                )}
-                                {revealed && !isPassed && (
+                                {scenario.concepts.map((c) => {
+                                    const hasExample = c in CONCEPT_EXAMPLES;
+                                    const isActive = activeConcept === c;
+                                    return (
+                                        <Badge
+                                            key={c}
+                                            variant={isActive ? "active-concept" : "concept"}
+                                            onClick={hasExample ? () => handleConceptClick(c) : undefined}
+                                        >
+                                            {conceptLabel(c)}
+                                        </Badge>
+                                    );
+                                })}
+                                {revealed ? (
                                     <Badge variant="revealed" icon={<EyeIcon size={11} />}>
                                         Revealed
+                                    </Badge>
+                                ) : isPassed && (
+                                    <Badge variant="passed" icon={<CheckIcon size={11} />}>
+                                        Passed
                                     </Badge>
                                 )}
                             </div>
@@ -153,7 +181,7 @@ export default function EditorPanel({
                             <Tooltip.Root>
                                 <Tooltip.Trigger asChild>
                                     <button
-                                        onClick={handleRun}
+                                        onClick={() => handleRun()}
                                         disabled={status !== "ready"}
                                         className="flex items-center gap-1.5 bg-green-400 hover:bg-green-300 active:translate-y-px active:shadow-none disabled:opacity-40 disabled:cursor-not-allowed text-zinc-900 text-sm font-medium px-3 py-1.5 rounded cursor-pointer shadow-[0_3px_0_0_#16a34a] transition-[box-shadow,transform] duration-75"
                                     >
@@ -175,7 +203,7 @@ export default function EditorPanel({
                         {scenario &&
                             passed !== true &&
                             !revealed &&
-                            !passedIds.includes(scenario.id) && (
+                            !passedIds.includes(shortcodeFromPrompt(scenario.prompt)) && (
                                 <Tooltip.Root>
                                     <Tooltip.Trigger asChild>
                                         <button
@@ -198,13 +226,36 @@ export default function EditorPanel({
                             )}
                     </div>
                 </div>
-                <Editor
-                    value={value}
-                    onChange={onChange}
-                    onRun={handleRun}
-                    schema={schema}
-                    engineId={engineId}
-                />
+                {activeConcept ? (
+                    <Group orientation="vertical" className="flex-1 min-h-0 overflow-hidden">
+                        <Panel defaultSize={60} minSize={20}>
+                            <div className="h-full flex flex-col">
+                                <Editor
+                                    value={value}
+                                    onChange={onChange}
+                                    onRun={handleRun}
+                                    schema={schema}
+                                    engineId={engineId}
+                                />
+                            </div>
+                        </Panel>
+                        <Separator className="h-1 bg-zinc-200 hover:bg-purple-400 cursor-row-resize transition-colors duration-75" />
+                        <Panel defaultSize={40} minSize={15}>
+                            <ConceptExamplePanel
+                                conceptId={activeConcept}
+                                onClose={() => setActiveConcept(null)}
+                            />
+                        </Panel>
+                    </Group>
+                ) : (
+                    <Editor
+                        value={value}
+                        onChange={onChange}
+                        onRun={handleRun}
+                        schema={schema}
+                        engineId={engineId}
+                    />
+                )}
             </div>
         </Tooltip.Provider>
     );

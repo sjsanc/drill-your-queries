@@ -24,10 +24,11 @@ import { formatQuery } from "../utils/formatQuery";
 
 interface EditorProps {
     value: string;
-    onChange: (value: string) => void;
-    onRun?: () => void;
+    onChange?: (value: string) => void;
+    onRun?: (sql: string) => void;
     schema?: SchemaTable[];
     engineId?: EngineId;
+    readonly?: boolean;
 }
 
 const sqlHighlight = HighlightStyle.define([
@@ -61,12 +62,16 @@ export default function Editor({
     onRun,
     schema = [],
     engineId = "sqlite",
+    readonly = false,
 }: EditorProps) {
     const containerRef = useRef<HTMLDivElement>(null);
     const viewRef = useRef<EditorView | null>(null);
     const onRunRef = useRef(onRun);
+    const onChangeRef = useRef(onChange);
     const engineIdRef = useRef(engineId);
+    const debounceRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
     onRunRef.current = onRun;
+    onChangeRef.current = onChange;
     engineIdRef.current = engineId;
 
     const sqlCompartment = useRef(new Compartment());
@@ -74,16 +79,71 @@ export default function Editor({
     useEffect(() => {
         if (!containerRef.current) return;
 
+        const interactiveExtensions = readonly
+            ? [EditorState.readOnly.of(true)]
+            : [
+                  highlightActiveLineGutter(),
+                  highlightActiveLine(),
+                  drawSelection(),
+                  indentOnInput(),
+                  closeBrackets(),
+                  autocompletion(),
+                  placeholder("Write your query here..."),
+                  Prec.highest(
+                      keymap.of([
+                          {
+                              key: "Tab",
+                              run: (v) => {
+                                  v.dispatch(v.state.replaceSelection("\t"));
+                                  return true;
+                              },
+                          },
+                          {
+                              key: "Ctrl-Enter",
+                              run: (v) => {
+                                  onRunRef.current?.(v.state.doc.toString());
+                                  return true;
+                              },
+                          },
+                          {
+                              key: "Ctrl-Shift-f",
+                              run: (v) => {
+                                  try {
+                                      const formatted = formatQuery(
+                                          v.state.doc.toString(),
+                                          engineIdRef.current,
+                                      );
+                                      v.dispatch({
+                                          changes: {
+                                              from: 0,
+                                              to: v.state.doc.length,
+                                              insert: formatted,
+                                          },
+                                      });
+                                  } catch {
+                                      // unparseable — leave as-is
+                                  }
+                                  return true;
+                              },
+                          },
+                      ]),
+                  ),
+                  EditorView.updateListener.of((update) => {
+                      if (update.docChanged) {
+                          const doc = update.state.doc.toString();
+                          clearTimeout(debounceRef.current);
+                          debounceRef.current = setTimeout(() => {
+                              onChangeRef.current?.(doc);
+                          }, 100);
+                      }
+                  }),
+              ];
+
         const view = new EditorView({
             state: EditorState.create({
                 doc: value,
                 extensions: [
                     lineNumbers(),
-                    highlightActiveLineGutter(),
-                    highlightActiveLine(),
-                    drawSelection(),
-                    indentOnInput(),
-                    closeBrackets(),
                     syntaxHighlighting(defaultHighlightStyle),
                     syntaxHighlighting(sqlHighlight),
                     sqlCompartment.current.of(
@@ -93,45 +153,8 @@ export default function Editor({
                             upperCaseKeywords: true,
                         }),
                     ),
-                    autocompletion(),
-                    placeholder("Write your query here..."),
-                    Prec.highest(
-                        keymap.of([
-                            {
-                                key: "Ctrl-Enter",
-                                run: () => {
-                                    onRunRef.current?.();
-                                    return true;
-                                },
-                            },
-                            {
-                                key: "Ctrl-Shift-f",
-                                run: (v) => {
-                                    try {
-                                        const formatted = formatQuery(
-                                            v.state.doc.toString(),
-                                            engineIdRef.current,
-                                        );
-                                        v.dispatch({
-                                            changes: {
-                                                from: 0,
-                                                to: v.state.doc.length,
-                                                insert: formatted,
-                                            },
-                                        });
-                                    } catch {
-                                        // unparseable — leave as-is
-                                    }
-                                    return true;
-                                },
-                            },
-                        ]),
-                    ),
                     baseTheme,
-                    EditorView.updateListener.of((update) => {
-                        if (update.docChanged)
-                            onChange(update.state.doc.toString());
-                    }),
+                    ...interactiveExtensions,
                 ],
             }),
             parent: containerRef.current,
