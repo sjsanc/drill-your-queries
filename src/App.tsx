@@ -22,9 +22,10 @@ import type { Scenario } from "./types/scenario";
 import { compareResults } from "./utils/compareResults";
 import { filterScenariosForEngine } from "./utils/filterScenarios";
 import { formatQuery } from "./utils/formatQuery";
-import { pickRandom } from "./utils/scenarioSelection";
+import { pickWithSR, sm2Key, updateSM2 } from "./utils/spacedRepetition";
 import { shortcodeFromPrompt } from "./utils/shortcode";
 import { STORAGE_KEYS } from "./utils/storageKeys";
+import type { SM2Store } from "./types/spacedRepetition";
 
 function LoadingOverlay({ engineId }: { engineId: string }) {
     return (
@@ -56,6 +57,10 @@ function Shell() {
     const [revealedIds, setRevealedIds] = useLocalStorage<string[]>(
         STORAGE_KEYS.revealedScenarios,
         [],
+    );
+    const [sm2Store, setSm2Store] = useLocalStorage<SM2Store>(
+        STORAGE_KEYS.sm2Store,
+        {},
     );
     const [revealed, setRevealed] = useState(false);
     const [currentScenarioId, setCurrentScenarioId] = useLocalStorage<
@@ -113,7 +118,7 @@ function Shell() {
             ? allScenarios.find((s) => scenarioKey(s) === currentScenarioId)
             : null;
         setScenario(
-            fromUrl ?? fromStorage ?? pickRandom(allScenarios, null, passedIds),
+            fromUrl ?? fromStorage ?? pickWithSR(allScenarios, null, sm2Store, schemaDef?.id ?? ""),
         );
     }, [allScenarios]);
 
@@ -128,7 +133,7 @@ function Shell() {
 
     useEffect(() => {
         if (!allScenarios.length) return;
-        setScenario(pickRandom(scenarioPool, null, passedIds));
+        setScenario(pickWithSR(scenarioPool, null, sm2Store, schemaDef?.id ?? ""));
     }, [schemaDef?.id]);
 
     useEffect(() => {
@@ -150,13 +155,16 @@ function Shell() {
     }, [scenario, status]);
 
     useEffect(() => {
-        if (
-            passed === true &&
-            !revealed &&
-            scenario &&
-            !passedIds.includes(scenarioKey(scenario))
-        ) {
-            setPassedIds((prev) => [...prev, scenarioKey(scenario)]);
+        if (passed === true && !revealed && scenario) {
+            if (!passedIds.includes(scenarioKey(scenario))) {
+                setPassedIds((prev) => [...prev, scenarioKey(scenario)]);
+            }
+            const key = sm2Key(schemaDef?.id ?? "", scenarioKey(scenario));
+            const now = Date.now();
+            setSm2Store((prev) => ({
+                ...prev,
+                [key]: updateSM2(prev[key], 4, now),
+            }));
         }
     }, [passed]);
 
@@ -173,7 +181,7 @@ function Shell() {
         setSelectedConcepts([]);
         setScenario((current) => {
             if (current?.engines && !(current.engines as string[]).includes(engineId)) {
-                return pickRandom(allScenarios, null, passedIds);
+                return pickWithSR(allScenarios, null, sm2Store, schemaDef?.id ?? "");
             }
             return current;
         });
@@ -204,6 +212,12 @@ function Shell() {
         if (!revealedIds.includes(scenarioKey(scenario))) {
             setRevealedIds((prev) => [...prev, scenarioKey(scenario)]);
         }
+        const key = sm2Key(schemaDef?.id ?? "", scenarioKey(scenario));
+        const now = Date.now();
+        setSm2Store((prev) => ({
+            ...prev,
+            [key]: updateSM2(prev[key], 1, now),
+        }));
     }
 
     function handleSkip() {
@@ -214,7 +228,7 @@ function Shell() {
             }));
         }
         setQueryText("");
-        setScenario((s) => pickRandom(scenarioPool, s, passedIds));
+        setScenario((s) => pickWithSR(scenarioPool, s, sm2Store, schemaDef?.id ?? ""));
     }
 
     function handleJump(target: Scenario) {
@@ -307,6 +321,8 @@ function Shell() {
                         passedIds={passedIds}
                         revealedIds={revealedIds}
                         onJump={handleJump}
+                        sm2Store={sm2Store}
+                        schemaId={schemaDef?.id ?? ""}
                     />
                 )}
             </div>

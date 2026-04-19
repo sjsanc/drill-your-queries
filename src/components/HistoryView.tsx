@@ -2,6 +2,8 @@ import * as Accordion from "@radix-ui/react-accordion";
 import { CheckIcon, ChevronDownIcon, EyeIcon } from "lucide-react";
 import { CONCEPTS, CONCEPT_GROUPS } from "../types/concepts";
 import type { Scenario } from "../types/scenario";
+import type { SM2Store } from "../types/spacedRepetition";
+import { sm2Key } from "../utils/spacedRepetition";
 import { shortcodeFromPrompt } from "../utils/shortcode";
 import Badge from "./Badge";
 
@@ -10,6 +12,8 @@ interface HistoryViewProps {
     passedIds: string[];
     revealedIds: string[];
     onJump: (scenario: Scenario) => void;
+    sm2Store: SM2Store;
+    schemaId: string;
 }
 
 function conceptLabel(id: string): string {
@@ -21,7 +25,10 @@ export default function HistoryView({
     passedIds,
     revealedIds,
     onJump,
+    sm2Store,
+    schemaId,
 }: HistoryViewProps) {
+    const now = Date.now();
     const scenariosByCategory = CONCEPT_GROUPS.map((group) => {
         const groupConceptIds = new Set(group.concepts.map((c) => c.id));
         const grouped = scenarios.filter((s) =>
@@ -39,6 +46,10 @@ export default function HistoryView({
                         const passedCount = group.filter((s) =>
                             passedIds.includes(shortcodeFromPrompt(s.prompt)),
                         ).length;
+                        const dueCount = group.filter((s) => {
+                            const r = sm2Store[sm2Key(schemaId, shortcodeFromPrompt(s.prompt))];
+                            return r && r.dueAt <= now;
+                        }).length;
 
                         return (
                             <Accordion.Item
@@ -53,6 +64,9 @@ export default function HistoryView({
                                     <span className="text-xs text-zinc-400">
                                         {passedCount}/{group.length} passed
                                     </span>
+                                    {dueCount > 0 && (
+                                        <Badge variant="due">{dueCount} due</Badge>
+                                    )}
                                     <ChevronDownIcon
                                         size={14}
                                         className="text-zinc-400 transition-transform duration-200"
@@ -66,6 +80,11 @@ export default function HistoryView({
                                             const revealed =
                                                 !passed &&
                                                 revealedIds.includes(key);
+                                            const sr = sm2Store[sm2Key(schemaId, key)];
+                                            const isDue = sr && sr.dueAt <= now;
+                                            const daysUntilDue = sr && !isDue
+                                                ? Math.ceil((sr.dueAt - now) / 86_400_000)
+                                                : null;
                                             return (
                                                 <li
                                                     key={key}
@@ -103,6 +122,14 @@ export default function HistoryView({
                                                         >
                                                             Revealed
                                                         </Badge>
+                                                    )}
+                                                    {isDue && (
+                                                        <Badge variant="due">Due</Badge>
+                                                    )}
+                                                    {daysUntilDue !== null && (
+                                                        <span className="text-xs text-zinc-400">
+                                                            in {daysUntilDue}d
+                                                        </span>
                                                     )}
                                                     <div className="flex items-center gap-1 flex-wrap justify-end">
                                                         {s.concepts.map((c) => (

@@ -8,4 +8,5 @@ export const STORAGE_KEYS = {
     revealedScenarios: "dyq:revealed-scenarios",
     currentScenarioId: "dyq:current-scenario-id",
     currentView: "dyq:current-view",
+    sm2Store: "dyq:sm2-store",
 } as const;

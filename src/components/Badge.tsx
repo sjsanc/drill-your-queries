@@ -6,6 +6,7 @@ const VARIANTS = {
     "active-concept": "bg-purple-100 text-purple-600",
     passed:           "font-medium bg-green-100 text-green-700",
     revealed:         "font-medium bg-amber-100 text-amber-700",
+    due:              "font-medium bg-orange-100 text-orange-700",
 } as const;
 
 type BadgeVariant = keyof typeof VARIANTS;

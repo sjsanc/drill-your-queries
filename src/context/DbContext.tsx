@@ -5,9 +5,6 @@ import {
     useReducer,
     useRef,
 } from "react";
-import { DuckdbEngine } from "../db/duckdb";
-import { PgliteEngine } from "../db/pglite";
-import { SqliteEngine } from "../db/sqlite";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { schemas } from "../schemas";
 import type { EngineId, IDbEngine, QueryResult } from "../types/engine";
@@ -63,9 +60,16 @@ interface DbProviderProps {
     children: React.ReactNode;
 }
 
-function makeEngine(id: EngineId): IDbEngine {
-    if (id === "sqlite") return new SqliteEngine();
-    if (id === "pg") return new PgliteEngine();
+async function makeEngine(id: EngineId): Promise<IDbEngine> {
+    if (id === "sqlite") {
+        const { SqliteEngine } = await import("../db/sqlite");
+        return new SqliteEngine();
+    }
+    if (id === "pg") {
+        const { PgliteEngine } = await import("../db/pglite");
+        return new PgliteEngine();
+    }
+    const { DuckdbEngine } = await import("../db/duckdb");
     return new DuckdbEngine();
 }
 
@@ -103,7 +107,7 @@ export function DbProvider({
         dispatch({ type: "INIT_START", engineId, schemaDef });
         try {
             await engineRef.current?.destroy();
-            const next = makeEngine(engineId);
+            const next = await makeEngine(engineId);
             await next.init();
             const sql =
                 typeof schemaDef.sql === "string"
